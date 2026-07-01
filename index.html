@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>QR Master Pro - منصة توليد أكواد QR المتكاملة</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        .premium-badge {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #555;
+            transition: all 0.3s;
+            border-radius: 8px;
+            flex: 1;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .form-section {
+            display: none;
+            text-align: right;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #34495e;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-size: 15px;
+            color: #2c3e50;
+            transition: all 0.3s;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button.gen-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+
+        button.gen-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button.gen-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .premium-feature {
+            position: relative;
+            border: 2px solid #ffd700;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            background: #fffbf0;
+        }
+
+        .premium-label {
+            position: absolute;
+            top: -12px;
+            right: 10px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .qr-result {
+            margin-top: 25px;
+            display: none;
+        }
+
+        .qr-container {
+            position: relative;
+            display: inline-block;
+            margin: 0 auto;
+        }
+
+        #qr-canvas {
+            background: #ffffff;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            max-width: 100%;
+            height: auto;
+        }
+
+        .color-preview {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .color-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .color-label {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+
+        .download-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #27ae60;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .download-btn:hover {
+            background: #2ecc71;
+            transform: translateY(-2px);
+        }
+
+        .subscription-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .subscribe-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .subscribe-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .size-control {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .size-control input {
+            flex: 1;
+        }
+
+        .size-value {
+            min-width: 50px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .logo-upload {
+            margin-top: 10px;
+        }
+
+        .disabled-input {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .warning-text {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .success-text {
+            color: #27ae60;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        .locked {
+            animation: shake 0.3s ease-in-out;
+        }
+
+        .reset-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 5px 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-top: 5px;
+        }
+
+        .reset-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="premium-badge">✨ PRO VERSION ✨</div>
+        <h2>QR Master Pro</h2>
+
+        <div class="subscription-card" id="subscriptionCard">
+            <div>
+                <strong>📱 الوضع الحالي:</strong><br>
+                <span id="userStatus">👤 مستخدم مجاني</span>
+            </div>
+            <button class="subscribe-btn" id="promoActionBtn" onclick="showSubscriptionPlans()">⭐ تفعيل الميزات</button>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab(event, 'wifi')">📡 واي فاي</button>
+            <button class="tab-btn" onclick="switchTab(event, 'whatsapp')">💬 واتساب</button>
+            <button class="tab-btn" onclick="switchTab(event, 'vcard')">👤 بطاقة أعمال</button>
+        </div>
+
+        <!-- WiFi Section -->
+        <div id="wifi-section" class="form-section active">
+            <div class="input-group">
+                <label>اسم شبكة الواي فاي (SSID):</label>
+                <input type="text" id="wifi-ssid" placeholder="اكتب اسم الشبكة بالضبط">
+                <div class="warning-text" id="wifi-ssid-error"></div>
+            </div>
+            <div class="input-group">
+                <label>كلمة المرور:</label>
+                <input type="password" id="wifi-pass" placeholder="أدخل كلمة مرور الشبكة">
+            </div>
+
+            <div class="premium-feature" id="wifiSizeFeature">
+                <div class="premium-label">⭐ ميزة مدفوعة</div>
+                <label>حجم الكود المخصص (بكسل):</label>
+                <div class="size-control">
+                    <input type="range" id="wifi-size" min="150" max="500" value="250" disabled>
+                    <span class="size-value" id="wifi-size-value">250px</span>
+                </div>
+            </div>
+
+            <button class="gen-btn" onclick="generateQR('wifi')">توليد كود الواي فاي</button>
+        </div>
+
+        <!-- WhatsApp Section -->
+        <div id="whatsapp-section" class="form-section">
+            <div class="input-group">
+                <label>رقم الهاتف (مع رمز الدولة):</label>
+                <input type="tel" id="wa-phone" placeholder="مثال: 201000000000">
+                <div class="warning-text" id="wa-phone-error"></div>
+            </div>
+            <div class="input-group">
+                <label>الرسالة التلقائية:</label>
+                <textarea id="wa-msg" rows="3" placeholder="اكتب الرسالة المسبقة هنا"></textarea>
+            </div>
+
+            <div class="premium-feature" id="whatsappColorFeature">
+                <div class="premium-label">⭐ ميزة مدفوعة</div>
+                <label>لون الخلفية:</label>
+                <input type="color" id="wa-bg-color" value="#ffffff" disabled>
+                <label style="margin-top: 10px;">لون المقدمة:</label>
+                <input type="color" id="wa-fg-color" value="#000000" disabled>
+                <div class="color-preview" id="colorPreview"></div>
+                <div class="warning-text" id="color-warning"></div>
+            </div>
+
+            <button class="gen-btn" onclick="generateQR('whatsapp')">توليد كود واتساب</button>
+        </div>
+
+        <!-- vCard Section -->
+        <div id="vcard-section" class="form-section">
+            <div class="input-group">
+                <label>الاسم الكامل:</label>
+                <input type="text" id="card-name" placeholder="الاسم الكامل">
+            </div>
+            <div class="input-group">
+                <label>رقم الهاتف:</label>
+                <input type="tel" id="card-phone" placeholder="رقم الموبايل">
+                <div class="warning-text" id="card-phone-error"></div>
+            </div>
+            <div class="input-group">
+                <label>البريد الإلكتروني:</label>
+                <input type="email" id="card-email" placeholder="name@example.com">
+            </div>
+
+            <div class="premium-feature" id="vcardLogoFeature">
+                <div class="premium-label">⭐ ميزة مدفوعة</div>
+                <label>إضافة شعار للكود:</label>
+                <div class="logo-upload">
+                    <input type="file" id="vcard-logo" accept="image/*" disabled>
+                    <div class="warning-text" id="logo-error"></div>
+                </div>
+            </div>
+
+            <button class="gen-btn" onclick="generateQR('vcard')">توليد بطاقة الأعمال</button>
+        </div>
+
+        <!-- QR Result Section -->
+        <div class="qr-result" id="qr-result-section">
+            <div class="qr-container">
+                <canvas id="qr-canvas"></canvas>
+            </div>
+            <br>
+            <button class="download-btn" id="download-btn" onclick="downloadQR()">📥 تحميل كود QR كـ صورة PNG</button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURATION
+        // ============================================
+
+        // كود التفعيل الصحيح هو: 0155110
+        const ACTIVATION_CODE = "0155110";
+
+        let currentUser = {
+            isPremium: false,
+            plan: 'free',
+            activatedAt: null
+        };
+
+        // ============================================
+        // USER STATE MANAGEMENT
+        // ============================================
+
+        function loadUserStatus() {
+            try {
+                const savedUser = localStorage.getItem('qr_user_premium');
+                if (savedUser) {
+                    const user = JSON.parse(savedUser);
+                    // التحقق من صلاحية التفعيل (لم يتم تعيين صلاحية منتهية)
+                    if (user.isPremium === true) {
+                        currentUser = user;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user status:', error);
+            }
+            updateUIForUser();
+        }
+
+        function saveUserStatus() {
+            try {
+                localStorage.setItem('qr_user_premium', JSON.stringify(currentUser));
+            } catch (error) {
+                console.error('Error saving user status:', error);
+            }
+        }
+
+        function resetUserStatus() {
+            currentUser = {
+                isPremium: false,
+                plan: 'free',
+                activatedAt: null
+            };
+            saveUserStatus();
+            updateUIForUser();
+
+            Swal.fire({
+                icon: 'info',
+                title: 'تم إعادة التعيين',
+                text: 'تم العودة إلى الوضع المجاني',
+                confirmButtonColor: '#667eea'
+            });
+        }
+
+        function updateUIForUser() {
+            const statusText = currentUser.isPremium ?
+                `👑 مستخدم مميز - جميع الميزات مفعلة` :
+                '👤 مستخدم مجاني - قم بتفعيل الميزات';
+            document.getElementById('userStatus').innerHTML = statusText;
+
+            // تفعيل/تعطيل الميزات المدفوعة
+            const wifiSize = document.getElementById('wifi-size');
+            const waBgColor = document.getElementById('wa-bg-color');
+            const waFgColor = document.getElementById('wa-fg-color');
+            const vcardLogo = document.getElementById('vcard-logo');
+
+            if (wifiSize) {
+                wifiSize.disabled = !currentUser.isPremium;
+                wifiSize.classList.toggle('disabled-input', !currentUser.isPremium);
+            }
+            if (waBgColor) {
+                waBgColor.disabled = !currentUser.isPremium;
+                waBgColor.classList.toggle('disabled-input', !currentUser.isPremium);
+            }
+            if (waFgColor) {
+                waFgColor.disabled = !currentUser.isPremium;
+                waFgColor.classList.toggle('disabled-input', !currentUser.isPremium);
+            }
+            if (vcardLogo) {
+                vcardLogo.disabled = !currentUser.isPremium;
+                vcardLogo.classList.toggle('disabled-input', !currentUser.isPremium);
+            }
+
+            // تحديث معاينة الألوان إذا كان المستخدم مميز
+            if (currentUser.isPremium) {
+                updateColorPreview();
+            } else {
+                const previewContainer = document.getElementById('colorPreview');
+                if (previewContainer) {
+                    previewContainer.innerHTML = '<div class="warning-text">🔒 قم بتفعيل الميزات لتخصيص الألوان</div>';
+                }
+            }
+        }
+
+        // ============================================
+        // ACTIVATION SYSTEM
+        // ============================================
+
+        async function showSubscriptionPlans() {
+            const { value: code } = await Swal.fire({
+                title: '🔑 تفعيل الميزات المتقدمة',
+                html: `
+                    <div style="text-align: right;">
+                        <p>أدخل كود التفعيل لفتح جميع الميزات المدفوعة:</p>
+                        <p style="color: #667eea; font-size: 12px; margin-top: 10px;">✨ الميزات التي ستفعل:<br>
+                        • تخصيص حجم الكود<br>
+                        • تخصيص ألوان الكود<br>
+                        • إضافة شعار مخصص</p>
+                    </div>
+                `,
+                input: 'text',
+                inputPlaceholder: 'أدخل كود التفعيل',
+                inputAttributes: {
+                    maxlength: 10,
+                    autocapitalize: 'off',
+                    autocomplete: 'off'
+                },
+                showCancelButton: true,
+                confirmButtonText: 'تفعيل',
+                cancelButtonText: 'إلغاء',
+                confirmButtonColor: '#667eea',
+                preConfirm: (inputCode) => {
+                    if (!inputCode) {
+                        Swal.showValidationMessage('الرجاء إدخال كود التفعيل');
+                        return false;
+                    }
+                    if (inputCode.trim() !== ACTIVATION_CODE) {
+                        Swal.showValidationMessage('⚠️ كود التفعيل غير صحيح');
+                        return false;
+                    }
+                    return inputCode;
+                }
+            });
+
+            if (code && code.trim() === ACTIVATION_CODE) {
+                activatePremium();
+            } else if (code) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'فشل التفعيل',
+                    text: 'كود التفعيل الذي أدخلته غير صحيح',
+                    confirmButtonColor: '#764ba2'
+                });
+            }
+        }
+
+        function activatePremium() {
+            currentUser = {
+                isPremium: true,
+                plan: 'pro',
+                activatedAt: Date.now()
+            };
+            saveUserStatus();
+            updateUIForUser();
+
+            Swal.fire({
+                icon: 'success',
+                title: '🎉 تم التفعيل بنجاح!',
+                html: `تم تفعيل جميع الميزات المدفوعة:<br>
+                       ✅ تخصيص حجم الكود<br>
+                       ✅ تخصيص ألوان الكود<br>
+                       ✅ إضافة شعار مخصص`,
+                confirmButtonColor: '#667eea',
+                timer: 3000,
+                timerProgressBar: true
+            });
+        }
+
+        function checkPremiumFeature(featureName) {
+            if (!currentUser.isPremium) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: '⭐ ميزة مدفوعة',
+                    text: `ميزة "${featureName}" متاحة فقط بعد التفعيل`,
+                    confirmButtonText: '🔑 تفعيل الآن',
+                    cancelButtonText: 'تذكر لاحقاً',
+                    showCancelButton: true,
+                    confirmButtonColor: '#f5576c'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        showSubscriptionPlans();
+                    }
+                });
+
+                // إضافة تأثير اهتزاز
+                const container = document.querySelector('.container');
+                container.classList.add('locked');
+                setTimeout(() => container.classList.remove('locked'), 300);
+                return false;
+            }
+            return true;
+        }
+
+        // ============================================
+        // COLOR PREVIEW
+        // ============================================
+
+        function updateColorPreview() {
+            if (!currentUser.isPremium) return;
+
+            const bgColor = document.getElementById('wa-bg-color').value;
+            const fgColor = document.getElementById('wa-fg-color').value;
+
+            const previewContainer = document.getElementById('colorPreview');
+            if (previewContainer) {
+                previewContainer.innerHTML = `
+                    <div style="text-align: center;">
+                        <div class="color-box" style="background-color: ${bgColor}; border: 2px solid #ddd;"></div>
+                        <div class="color-label">لون الخلفية</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="color-box" style="background-color: ${fgColor}; border: 2px solid #ddd;"></div>
+                        <div class="color-label">لون المقدمة</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="color-box" style="background: repeating-linear-gradient(45deg, ${bgColor}, ${bgColor} 5px, ${fgColor} 5px, ${fgColor} 10px); border: 2px solid #ddd;"></div>
+                        <div class="color-label">معاينة سريعة</div>
+                    </div>
+                `;
+            }
+        }
+
+        // ============================================
+        // TAB SWITCHING
+        // ============================================
+
+        function switchTab(event, tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.form-section').forEach(sec => sec.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-section').classList.add('active');
+            document.getElementById('qr-result-section').style.display = 'none';
+        }
+
+        // ============================================
+        // QR CODE GENERATION
+        // ============================================
+
+        async function generateQR(type) {
+            let qrText = "";
+            let options = {
+                size: 250,
+                background: '#ffffff',
+                foreground: '#000000'
+            };
+
+            // Clear previous errors
+            clearErrors();
+
+            if (type === 'wifi') {
+                const ssid = document.getElementById('wifi-ssid').value.trim();
+                const pass = document.getElementById('wifi-pass').value.trim();
+
+                if (!ssid) {
+                    showError('wifi-ssid-error', 'يرجى إدخال اسم الشبكة');
+                    return;
+                }
+
+                qrText = `WIFI:S:${escapeWifiString(ssid)};T:WPA;P:${escapeWifiString(pass)};;`;
+
+                // ميزة حجم مخصص
+                const customSize = parseInt(document.getElementById('wifi-size').value);
+                if (customSize !== 250) {
+                    if (!checkPremiumFeature('تخصيص حجم الكود')) return;
+                    options.size = customSize;
+                }
+            }
+            else if (type === 'whatsapp') {
+                const phone = document.getElementById('wa-phone').value.trim();
+                const msg = document.getElementById('wa-msg').value;
+
+                if (!phone) {
+                    showError('wa-phone-error', 'يرجى إدخال رقم الهاتف');
+                    return;
+                }
+
+                qrText = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+
+                // ميزة تخصيص الألوان
+                const bgColor = document.getElementById('wa-bg-color').value;
+                const fgColor = document.getElementById('wa-fg-color').value;
+
+                if (bgColor !== '#ffffff' || fgColor !== '#000000') {
+                    if (!checkPremiumFeature('تخصيص ألوان الكود')) return;
+                    options.background = bgColor;
+                    options.foreground = fgColor;
+                }
+            }
+            else if (type === 'vcard') {
+                const name = document.getElementById('card-name').value.trim();
+                const phone = document.getElementById('card-phone').value.trim();
+                const email = document.getElementById('card-email').value.trim();
+
+                if (!name || !phone) {
+                    showError('card-phone-error', 'يرجى ملء الاسم والهاتف على الأقل');
+                    return;
+                }
+
+                // تنسيق vCard صحيح
+                qrText = `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nTEL:${phone}`;
+                if (email) qrText += `\nEMAIL:${email}`;
+                qrText += `\nEND:VCARD`;
+
+                // ميزة إضافة شعار
+                const logoFile = document.getElementById('vcard-logo').files[0];
+                if (logoFile) {
+                    if (!checkPremiumFeature('إضافة شعار مخصص')) return;
+                    options.logo = await readLogoFile(logoFile);
+                }
+            }
+
+            await renderQRCode(qrText, options);
+        }
+
+        function escapeWifiString(str) {
+            // تخطي الأحرف الخاصة في كود الواي فاي
+            return str.replace(/[\\;,:]/g, '\\$&');
+        }
+
+        async function renderQRCode(qrText, options) {
+            const canvas = document.getElementById('qr-canvas');
+            const resultSection = document.getElementById('qr-result-section');
+
+            try {
+                // إنشاء كود QR
+                const qr = new QRious({
+                    element: canvas,
+                    value: qrText,
+                    size: options.size,
+                    level: 'H',
+                    background: options.background,
+                    foreground: options.foreground
+                });
+
+                // إظهار النتيجة
+                resultSection.style.display = 'block';
+
+                // إضافة شعار إذا وجد
+                if (options.logo && currentUser.isPremium) {
+                    await addLogoToQR(canvas, options.logo);
+                }
+
+                // تمرير إلى النتيجة
+                resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            } catch (error) {
+                console.error('QR Generation error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'خطأ',
+                    text: 'حدث خطأ أثناء توليد الكود',
+                    confirmButtonColor: '#764ba2'
+                });
+            }
+        }
+
+        function readLogoFile(file) {
+            return new Promise((resolve, reject) => {
+                if (file.size > 2 * 1024 * 1024) {
+                    showError('logo-error', 'حجم الشعار كبير جداً (الحد الأقصى 2MB)');
+                    reject(new Error('File too large'));
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = () => reject(new Error('Failed to read file'));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function addLogoToQR(canvas, logoDataUrl) {
+            return new Promise((resolve) => {
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+
+                img.onload = () => {
+                    const size = canvas.width;
+                    const logoSize = size * 0.22;
+                    const x = (size - logoSize) / 2;
+                    const y = (size - logoSize) / 2;
+
+                    // خلفية بيضاء للشعار
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(x - 5, y - 5, logoSize + 10, logoSize + 10);
+
+                    // رسم الشعار
+                    ctx.drawImage(img, x, y, logoSize, logoSize);
+                    resolve();
+                };
+
+                img.onerror = () => resolve();
+                img.src = logoDataUrl;
+            });
+        }
+
+        // ============================================
+        // DOWNLOAD FUNCTION
+        // ============================================
+
+        function downloadQR() {
+            const canvas = document.getElementById('qr-canvas');
+            const link = document.createElement('a');
+            link.download = `QR-${Date.now()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // ============================================
+        // UTILITIES
+        // ============================================
+
+        function clearErrors() {
+            document.querySelectorAll('.warning-text').forEach(el => {
+                if (el.id !== 'color-warning') {
+                    el.textContent = '';
+                }
+            });
+        }
+
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = '⚠️ ' + message;
+            }
+        }
+
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // تحديث قيمة شريط التمرير
+            const wifiSize = document.getElementById('wifi-size');
+            if (wifiSize) {
+                wifiSize.addEventListener('input', function () {
+                    document.getElementById('wifi-size-value').textContent = this.value + 'px';
+                });
+            }
+
+            // معاينة الألوان
+            const bgColor = document.getElementById('wa-bg-color');
+            const fgColor = document.getElementById('wa-fg-color');
+            if (bgColor && fgColor) {
+                bgColor.addEventListener('change', updateColorPreview);
+                fgColor.addEventListener('change', updateColorPreview);
+            }
+
+            // إضافة زر إعادة تعيين سري (للتطوير)
+            const subscriptionCard = document.getElementById('subscriptionCard');
+            if (subscriptionCard) {
+                const resetBtn = document.createElement('button');
+                resetBtn.textContent = '🔄 إعادة تعيين';
+                resetBtn.className = 'reset-btn';
+                resetBtn.onclick = resetUserStatus;
+                resetBtn.style.display = 'none'; // إخفاء للاستخدام العادي - يمكن إظهاره للتطوير
+                subscriptionCard.appendChild(resetBtn);
+            }
+        });
+
+        // تحميل حالة المستخدم
+        loadUserStatus();
+    </script>
+</body>
+
+</html>
